@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import SwiftyJSON
+import SDWebImageSwiftUI
 
 struct ContentView: View {
     var body: some View {
@@ -18,4 +20,13 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
+}
+
+struct Movie: Identifiable {
+    var id : String
+    var title : String
+    var desc : String
+    var date : String
+    var image : String
+    var rating : Double
 }
