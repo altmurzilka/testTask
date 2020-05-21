@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import URLImage
 
 struct ContentView: View {
     @ObservedObject var obs = observer()
@@ -16,9 +17,9 @@ struct ContentView: View {
         .edgesIgnoringSafeArea(.all)
             NavigationView {
                 List(obs.moviesList){i in
-                    ListRow(url: i.poster_path, name: i.original_title, rating: i.vote_average, overview: i.overview)
+                    ListRow(url: i.poster_path, name: i.original_title, rating: i.vote_average, rel_date: i.release_date)
                 }
-                .navigationBarTitle("News")
+                .navigationBarTitle("News", displayMode: .inline)
             }
         }
     }
@@ -26,15 +27,15 @@ struct ContentView: View {
 
 class observer : ObservableObject {
     
-    @Published var moviesList = [dataType2]()
+    @Published var moviesList = [Movie]()
     
     init() {
-        let url = "https://api.themoviedb.org/3/movie/top_rated?api_key=3d19363f85ab4a409c9fb1d53e5b61e3&language=en-US&page=1"
+        let url = "https://api.themoviedb.org/3/movie/popular?api_key=3d19363f85ab4a409c9fb1d53e5b61e3&language=en-US"
         let sess = URLSession(configuration: .default)
         
         sess.dataTask(with: URL(string: url)!) {(data, _, _) in
             do{
-                let fetch = try JSONDecoder().decode(dataType.self, from: data!)
+                let fetch = try JSONDecoder().decode(MovieList.self, from: data!)
                 
                 DispatchQueue.main.async {
                     self.moviesList = fetch.results
@@ -47,16 +48,21 @@ class observer : ObservableObject {
 }
 
 
-struct dataType: Decodable {
-    var results : [dataType2]
+struct MovieList: Decodable {
+    var results : [Movie]
 }
 
-struct dataType2: Identifiable, Decodable {
-    var id : Int
-    var original_title: String
+struct Movie: Identifiable, Decodable {
+    var vote_count: Int
+    var id: Int
     var vote_average: CGFloat
+    var title: String
     var poster_path: String
+    var original_language: String
+    var original_title: String
+    var adult: Bool
     var overview: String
+    var release_date: String
 }
 
 
@@ -66,6 +72,7 @@ struct ListRow : View {
     var name = ""
     var rating : CGFloat = 0
     var overview = ""
+    var rel_date = ""
     var body: some View {
         ZStack {
             AnimatedImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(url)"))
@@ -79,8 +86,8 @@ struct ListRow : View {
                     .foregroundColor(.black)
                     .font(.title)
                     .fontWeight(.heavy)
-                .padding()
-                // Text("Rating = \(rating, specifier: "%g")")
+                    .multilineTextAlignment(.center)
+                // Text("\(rating, specifier: "%g")")
                // Text(overview).lineLimit(2)
             }
         }
