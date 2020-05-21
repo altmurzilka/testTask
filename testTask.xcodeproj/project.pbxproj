@@ -13,7 +13,6 @@
 		F11F58A82475DEDB0071A1EA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F11F58A72475DEDB0071A1EA /* Assets.xcassets */; };
 		F11F58AB2475DEDB0071A1EA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F11F58AA2475DEDB0071A1EA /* Preview Assets.xcassets */; };
 		F11F58AE2475DEDB0071A1EA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F11F58AC2475DEDB0071A1EA /* LaunchScreen.storyboard */; };
-		F11F58B72475E1810071A1EA /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = F11F58B62475E1810071A1EA /* SwiftyJSON */; };
 		F11F58BA2475E1E50071A1EA /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = F11F58B92475E1E50071A1EA /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
 
@@ -34,7 +33,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11F58BA2475E1E50071A1EA /* SDWebImageSwiftUI in Frameworks */,
-				F11F58B72475E1810071A1EA /* SwiftyJSON in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,7 +94,6 @@
 			);
 			name = testTask;
 			packageProductDependencies = (
-				F11F58B62475E1810071A1EA /* SwiftyJSON */,
 				F11F58B92475E1E50071A1EA /* SDWebImageSwiftUI */,
 			);
 			productName = testTask;
@@ -375,11 +372,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F11F58B62475E1810071A1EA /* SwiftyJSON */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F11F58B52475E1810071A1EA /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
-			productName = SwiftyJSON;
-		};
 		F11F58B92475E1E50071A1EA /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F11F58B82475E1E50071A1EA /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
