@@ -7,8 +7,10 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 import URLImage
+import SwiftyJSON
+import SDWebImageSwiftUI
+
 
 struct ContentView: View {
     @ObservedObject var obs = observer()
@@ -17,7 +19,9 @@ struct ContentView: View {
         .edgesIgnoringSafeArea(.all)
             NavigationView {
                 List(obs.moviesList){i in
-                    ListRow(url: i.poster_path, name: i.original_title, rating: i.vote_average, rel_date: i.release_date)
+                    NavigationLink(destination: MovieDetails(movie: i)){
+                        ListRow(url: i.poster_path, name: i.original_title, rating: i.vote_average, overview: i.overview)
+                    }.padding(.trailing, -32.0)
                 }
                 .navigationBarTitle("News", displayMode: .inline)
             }
@@ -30,12 +34,15 @@ class observer : ObservableObject {
     @Published var moviesList = [Movie]()
     
     init() {
-        let url = "https://api.themoviedb.org/3/movie/popular?api_key=3d19363f85ab4a409c9fb1d53e5b61e3&language=en-US"
+        let sourse = "https://api.themoviedb.org/3/movie/popular?api_key=3d19363f85ab4a409c9fb1d53e5b61e3&language=en-US"
+        
+        let url = URL(string: sourse)!
+        
         let sess = URLSession(configuration: .default)
         
-        sess.dataTask(with: URL(string: url)!) {(data, _, _) in
+        sess.dataTask(with: url) {(data, _, _) in
             do{
-                let fetch = try JSONDecoder().decode(MovieList.self, from: data!)
+                let fetch = try JSONDecoder().decode(dataType.self, from: data!)
                 
                 DispatchQueue.main.async {
                     self.moviesList = fetch.results
@@ -48,23 +55,9 @@ class observer : ObservableObject {
 }
 
 
-struct MovieList: Decodable {
+struct dataType: Decodable {
     var results : [Movie]
 }
-
-struct Movie: Identifiable, Decodable {
-    var vote_count: Int
-    var id: Int
-    var vote_average: CGFloat
-    var title: String
-    var poster_path: String
-    var original_language: String
-    var original_title: String
-    var adult: Bool
-    var overview: String
-    var release_date: String
-}
-
 
 struct ListRow : View {
     
