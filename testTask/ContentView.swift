@@ -16,7 +16,7 @@ struct ContentView: View {
     @ObservedObject var obs = observer()
     var body: some View {
         ZStack { LinearGradient(gradient: Gradient(colors: [.blue, .black]), startPoint: .top, endPoint: .bottom)
-        .edgesIgnoringSafeArea(.all)
+            .edgesIgnoringSafeArea(.all)
             NavigationView {
                 List(obs.moviesList){i in
                     NavigationLink(destination: MovieDetails(movie: i)){
@@ -42,7 +42,7 @@ class observer : ObservableObject {
         
         sess.dataTask(with: url) {(data, _, _) in
             do{
-                let fetch = try JSONDecoder().decode(dataType.self, from: data!)
+                let fetch = try JSONDecoder().decode(MovieList.self, from: data!)
                 
                 DispatchQueue.main.async {
                     self.moviesList = fetch.results
@@ -52,11 +52,6 @@ class observer : ObservableObject {
             }
         }.resume()
     }
-}
-
-
-struct dataType: Decodable {
-    var results : [Movie]
 }
 
 struct ListRow : View {
@@ -80,8 +75,9 @@ struct ListRow : View {
                     .font(.title)
                     .fontWeight(.heavy)
                     .multilineTextAlignment(.center)
+                    .padding()
                 // Text("\(rating, specifier: "%g")")
-               // Text(overview).lineLimit(2)
+                // Text(overview).lineLimit(2)
             }
         }
     }

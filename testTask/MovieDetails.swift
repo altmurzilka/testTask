@@ -15,12 +15,24 @@ struct MovieDetails : View {
     var body: some View {
         VStack {
             AnimatedImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(movie.poster_path)"))
+                .resizable().frame(width: 370, height: 370)
+                .clipShape(RoundedRectangle(cornerRadius: 25.0))
+                .aspectRatio(contentMode: .fit)
             HStack {
-                Text("Description").foregroundColor(.gray)
+                Text("\(movie.original_title)").foregroundColor(.gray)
+                Spacer()
+                Text("\(movie.release_date)").foregroundColor(.gray)
+            }
+            HStack {
+                Text("Description").foregroundColor(.gray).padding(.vertical, 10)
                 Spacer()
             }
             Text(movie.overview).lineLimit(nil)
             Spacer()
+            HStack {
+                Spacer()
+                Text("Rating: \(movie.vote_average, specifier: "%g")").font(.headline)
+            }
         }.navigationBarTitle(Text(movie.original_title), displayMode: .inline)
             .padding()
     }

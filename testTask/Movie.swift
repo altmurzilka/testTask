@@ -8,10 +8,21 @@
 
 import SwiftUI
 
+struct MovieList: Decodable {
+    let page: Int
+    let total_results: Int
+    let total_pages: Int
+    var results : [Movie]
+}
+
 struct Movie: Identifiable, Decodable {
     var id : Int
     var original_title: String
     var vote_average: CGFloat
     var poster_path: String
+    var original_language: String
+    let title: String
+    let release_date: String
     var overview: String
 }
+
