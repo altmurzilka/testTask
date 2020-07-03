@@ -10,6 +10,7 @@ import SwiftUI
 import URLImage
 import SwiftyJSON
 import SDWebImageSwiftUI
+import Combine
 
 
 struct ContentView: View {
@@ -33,25 +34,57 @@ class observer : ObservableObject {
     
     @Published var moviesList = [Movie]()
     
+    var pageStatus = PageStatus.ready(nextPage: 1)
+    
+    let sourse = "https://api.themoviedb.org/3/movie/popular?api_key=3d19363f85ab4a409c9fb1d53e5b61e3&language=en-US&page="
+    @Published var endOfList = false
+    var cancellable : Set<AnyCancellable> = Set()
+    
     init() {
-        let sourse = "https://api.themoviedb.org/3/movie/popular?api_key=3d19363f85ab4a409c9fb1d53e5b61e3&language=en-US"
-        
-        let url = URL(string: sourse)!
-        
-        let sess = URLSession(configuration: .default)
-        
-        sess.dataTask(with: url) {(data, _, _) in
-            do{
-                let fetch = try JSONDecoder().decode(MovieList.self, from: data!)
-                
-                DispatchQueue.main.async {
-                    self.moviesList = fetch.results
-                }
-            } catch {
-                print(error.localizedDescription)
-            }
-        }.resume()
+        fetchData()
     }
+    
+    func shouldLoadMore(i : Movie) -> Bool{
+        if let lastId = moviesList.last?.id{
+            if i.id == lastId{
+                return true
+            }
+            else{
+                return false
+            }
+        }
+        return false
+    }
+    
+    func fetchData() {
+        guard case let .ready(page) = pageStatus else {
+            return
+        }
+        pageStatus = .loading(page: page)
+        
+        URLSession.shared.dataTaskPublisher(for: URL(string: "\(sourse)\(page)")!).tryMap { output in
+            guard let _ = output.response as? HTTPURLResponse else {
+                throw MyError.httpError
+            }
+            return output.data
+        }
+        .decode(type: MovieList.self, decoder: JSONDecoder())
+        .replaceError(with: MovieList(page: Int, results: []))
+        .eraseToAnyPublisher()
+        
+        
+        
+        
+        try JSONDecoder().decode(MovieList.self, from: data!)
+        
+        DispatchQueue.main.async {
+            self.moviesList = fetch.results
+        }
+    } catch {
+    print(error.localizedDescription)
+    }
+}.resume()
+}
 }
 
 struct ListRow : View {
@@ -88,3 +121,17 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
+enum MyError: Error {
+    case limitError
+    case httpError
+    case parseError
+}
+
+enum PageStatus {
+    case ready (nextPage: Int)
+    case loading (page: Int)
+    case done
+}
+
+
