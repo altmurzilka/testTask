@@ -84,8 +84,8 @@ class observer : ObservableObject {
     print(error.localizedDescription)
     }
 }.resume()
-}
-}
+
+
 
 struct ListRow : View {
     

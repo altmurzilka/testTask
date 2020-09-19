@@ -8,8 +8,8 @@
 import Foundation
 
 struct Results: Codable {
-    let results: [Movie]
     let page: Int
-    let totalPages: Int
-    let totalResults: Int
+    let totalResults: Int?
+    let totalPages: Int?
+    let results: [Movie]
 }

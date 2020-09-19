@@ -1,13 +1,13 @@
 //
-//  PopularMoviesVC.swift
-//  Movies
+//  ViewController.swift
+//  MovieAppTestTask
 //
-//  Created by Алтын on 9/18/20.
+//  Created by Алтын on 9/19/20.
 //
 
 import UIKit
 
-class PopularMoviesVC: UIViewController {
+class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

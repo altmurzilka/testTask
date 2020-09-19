@@ -7,13 +7,17 @@
 
 import Foundation
 
-struct Movie: Codable {
-    let id: Int
-    let title: String
-    let overview: String
-    let posterPath: String
-    let backgroundPath: String
+struct Movie: Codable, Identifiable {
     let voteCount: Int
-    let voteAvarage: Double
-    let releaseDate: String
+    let id: Int
+    let video: Bool
+    let voteAverage: Double
+    let title: String
+    let popularity: Double
+    let posterPath: String?
+    let originalLanguage: String
+    let originalTitle: String
+    let backdropPath: String?
+    let adult: Bool
+    let overview: String
 }

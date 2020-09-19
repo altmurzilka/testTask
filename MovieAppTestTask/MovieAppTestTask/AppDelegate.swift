@@ -1,8 +1,8 @@
 //
 //  AppDelegate.swift
-//  Movies
+//  MovieAppTestTask
 //
-//  Created by Алтын on 9/18/20.
+//  Created by Алтын on 9/19/20.
 //
 
 import UIKit
