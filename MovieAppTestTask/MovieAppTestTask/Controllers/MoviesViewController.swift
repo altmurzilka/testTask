@@ -12,29 +12,16 @@ import Foundation
 final class MoviesViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
-    fileprivate let searchController = UISearchController(searchResultsController: nil)
     fileprivate var movies = [Movie]()
-    fileprivate var state : State = .discoverySearch
     fileprivate var nextPage = 2
-    fileprivate var textToSearch = ""
-    
-    enum State {
-        case regularSearch
-        case notregularSearchYet
-        case noResults
-        case discoverySearch
-    }
     
     fileprivate struct TableViewCellIdentifiers{
         static var movie = "MovieCell"
-        static var nothingFound = "NothingFoundCell"
-        static var movieSearch = "MovieSearchCell"
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
-        setupSearchController()
         getTopMovies()
     }
     
@@ -48,30 +35,11 @@ final class MoviesViewController: UIViewController {
                 }
                 
                 self?.movies = self!.mergeMovies(currentMovies: self!.movies, newMovies: movies, page: page)
-                self?.state = movies.count > 0 ? .discoverySearch : .noResults
                 
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                 }
                 
-            }
-        }
-    }
-    
-    @objc fileprivate dynamic func searchMovieWith(page : Int = 1){
-        WebApi.instance.searchMovie(movieTitle: textToSearch, page: page == 0 ? 1 : page){ [weak self] (movies, webResponse) in
-            if !webResponse.isError{
-                
-                if movies.count < 20{
-                    self?.stopPagination()
-                }
-                
-                self?.movies = self!.mergeMovies(currentMovies: self!.movies, newMovies: movies, page: page == 0 ? 1 : page)
-                self?.state = movies.count > 0 ? .regularSearch : .noResults
-                
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
             }
         }
     }
@@ -104,40 +72,6 @@ final class MoviesViewController: UIViewController {
     
 }
 
-// MARK: SearchResultsUpdating
-extension MoviesViewController : UISearchResultsUpdating{
-    
-    fileprivate func setupSearchController(){
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        definesPresentationContext = true
-    }
-    
-    func updateSearchResults(for searchController: UISearchController) {
-        resetPagination() // Reset next page when any interaction happens to Search Controller
-        if searchController.isActive{
-            guard let searchText = searchController.searchBar.text else { return }
-            
-            if !searchText.isEmpty{
-                
-                // This is the magic trick! Just send the request after 0.3 seconds delay, canceling the last request if it wasnt completed.
-                textToSearch = searchText
-                NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.searchMovieWith(page:)), object: nil)
-                perform(#selector(self.searchMovieWith(page:)), with: nil, afterDelay: 0.3)
-                
-            }else{
-                state = .notregularSearchYet
-                tableView.reloadData()
-            }
-            
-        }else{ // Closing search bar
-            state = .discoverySearch
-            getTopMovies()
-        }
-    }
-    
-}
-
 
 // MARK: TableViewDelegate & DataSource
 extension MoviesViewController : UITableViewDelegate, UITableViewDataSource{
@@ -146,13 +80,10 @@ extension MoviesViewController : UITableViewDelegate, UITableViewDataSource{
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UINib(nibName: "MovieTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIdentifiers.movie)
-        tableView.register(UINib(nibName: "NothingFoundTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIdentifiers.nothingFound)
-        tableView.register(UINib(nibName: "MovieSearchTableViewCell", bundle: nil), forCellReuseIdentifier: TableViewCellIdentifiers.movieSearch)
         tableView.estimatedRowHeight = 187
         tableView.rowHeight = UITableView.automaticDimension
         tableView.setNeedsLayout()
         tableView.layoutIfNeeded()
-        tableView.tableHeaderView = searchController.searchBar
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -160,27 +91,13 @@ extension MoviesViewController : UITableViewDelegate, UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch state{
-            case .discoverySearch, .regularSearch:
-                return movies.count
-            case .notregularSearchYet, .noResults:
-                return 1
-        }
+        return movies.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch state{
-            case .discoverySearch, .regularSearch:
-                let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.movie) as! MovieTableViewCell
-                cell.fill(movie: movies[indexPath.row])
-                return cell
-            
-            case .notregularSearchYet:
-                return tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.movieSearch) as! MovieSearchTableViewCell
-            
-            case .noResults:
-                return tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.nothingFound) as! NothingFoundTableViewCell
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.movie) as! MovieTableViewCell
+        cell.fill(movie: movies[indexPath.row])
+        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -193,16 +110,10 @@ extension MoviesViewController : UITableViewDelegate, UITableViewDataSource{
             return
         }
         
-        if state == .discoverySearch || state == .regularSearch{
-            if indexPath.row == movies.count - 1{
-                if state == .discoverySearch{
-                    getTopMovies(page: nextPage)
-                }else if state == .regularSearch{
-                    searchMovieWith(page: nextPage)
-                }
-                nextPage += 1
-            }
+        if indexPath.row == movies.count - 1{
+            nextPage += 1
         }
+        
     }
     
 }

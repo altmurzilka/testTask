@@ -1,11 +1,19 @@
 //
 //  WebApi.swift
-//  MovieAppTestTask
+//  Hummingbird_movies
 //
-//  Created by Алтын on 9/19/20.
+//  Created by iCasei Site on 25/04/17.
+//  Copyright © 2017 iCasei Site. All rights reserved.
 //
 
 import Foundation
+
+/*
+ 
+ Class acting as an 'interface' for the WebClient, providing all parameters scheme, data parse, url compose and more.
+ 
+ */
+
 
 final class WebApi{
     
@@ -14,11 +22,12 @@ final class WebApi{
     
     private enum Path : String{
         case discover_movies = "/discover/movie"
+        case search_movies = "/search/movie"
     }
     
     private struct Parameters{
-        static let language = ["language" : "ru-RU"]
-        static let api_key = ["api_key" : "3d19363f85ab4a409c9fb1d53e5b61e3"]
+        static let language = ["language" : "pt-BR"]
+        static let api_key = ["api_key" : "70b1a97dd18bf106f5031f0f34558789"]
         static let sort_by = ["sort_by" : "popularity.desc"]
         static let page = ["page" : "1"]
     }
@@ -58,6 +67,16 @@ final class WebApi{
     func getTopMovies(page : Int = 1, onComplete : @escaping getTopMoviesOnComplete){
         
         let url = Url(path: .discover_movies, parameters: [Parameter(parameter: Parameters.language), Parameter(parameter: Parameters.api_key), Parameter(parameter: Parameters.sort_by), Parameter(parameter : ["page" : "\(page)"])])
+        
+        WebClient().request(url: fillUrl(url: url)) { (webResponse) in
+            onComplete(Movie.returnMovies(json: webResponse.json!), webResponse)
+        }
+    }
+    
+    typealias searchMovieOnComplete = ([Movie], WebResponse) -> Void
+    func searchMovie(movieTitle : String, page : Int = 1, onComplete : @escaping searchMovieOnComplete){
+        
+        let url = Url(path: .search_movies, parameters: [Parameter(parameter: Parameters.language), Parameter(parameter: Parameters.api_key), Parameter(parameter: ["query" : movieTitle]), Parameter(parameter : ["page" : "\(page)"])])
         
         WebClient().request(url: fillUrl(url: url)) { (webResponse) in
             onComplete(Movie.returnMovies(json: webResponse.json!), webResponse)

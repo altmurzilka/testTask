@@ -1,8 +1,9 @@
 //
 //  MovieSearchTableViewCell.swift
-//  MovieAppTestTask
+//  Hummingbird_movies
 //
-//  Created by Алтын on 9/19/20.
+//  Created by iCasei Site on 26/04/17.
+//  Copyright © 2017 iCasei Site. All rights reserved.
 //
 
 import UIKit
@@ -14,4 +15,5 @@ class MovieSearchTableViewCell: UITableViewCell {
         selectionStyle = .none
     }
 
+    
 }
